@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VALORANT LAB — Theme Prototype</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#081018; --panel:#0d1720; --line:rgba(148,163,184,.14);
+      --text:#eef5f7; --muted:#91a3af;
+      --accent:#78ead8; --accent-rgb:120,234,216; --accent-soft:rgba(120,234,216,.14);
+      --agent-glow:rgba(76,255,188,.16); --danger:#ff666f; --warn:#f6c968; --sidebar:208px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;font-family:'Montserrat','Noto Sans TC',sans-serif;background:var(--bg);color:var(--text)}
+    body{
+      background:
+        radial-gradient(circle at 88% 0%, rgba(var(--accent-rgb),.06), transparent 30%),
+        radial-gradient(circle at 8% 86%, var(--agent-glow), transparent 24%),
+        linear-gradient(180deg,#071019 0%,#081018 100%);
+      transition:.35s;
+    }
+    button,input,select{font:inherit} button{cursor:pointer}
+    .app{min-height:100vh;display:grid;grid-template-columns:var(--sidebar) minmax(0,1fr)}
+
+    .sidebar{position:sticky;top:0;height:100vh;background:linear-gradient(180deg,rgba(8,16,24,.99),rgba(9,21,30,.96));border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden;z-index:10}
+    .brand{padding:28px 24px 22px;border-bottom:1px solid var(--line)}
+    .logo-mark{width:35px;height:30px;position:relative;margin-bottom:14px}
+    .logo-mark:before,.logo-mark:after{content:"";position:absolute;background:#ff6874;transform:skewX(-25deg)}
+    .logo-mark:before{width:13px;height:30px;left:3px}.logo-mark:after{width:20px;height:9px;left:12px;bottom:2px}
+    .brand h1{margin:0;font-size:17px;letter-spacing:.05em;font-weight:900}
+    .brand small{display:block;margin-top:5px;color:#71828f;font-size:9px;letter-spacing:.13em}
+
+    .nav{padding:17px 10px;display:flex;flex-direction:column;gap:7px}
+    .nav-item{display:flex;align-items:center;gap:13px;padding:11px 14px;border-radius:9px;color:#a9bac5;text-decoration:none;border:1px solid transparent;transition:.2s}
+    .nav-item:hover{background:rgba(255,255,255,.035);color:#fff}
+    .nav-item.active{color:var(--accent);background:linear-gradient(90deg,var(--accent-soft),rgba(var(--accent-rgb),.02));border-color:rgba(var(--accent-rgb),.15);box-shadow:inset 3px 0 0 var(--accent)}
+    .nav-ico{width:22px;text-align:center;font-size:18px}
+    .nav-copy b{font-size:13px;display:block}.nav-copy span{font-size:10px;color:#667b88;display:block;margin-top:1px}
+    .nav-item.active .nav-copy span{color:rgba(var(--accent-rgb),.7)}
+
+    .agent-art{
+      margin-top:auto;
+      min-height:455px;
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 45% 38%,var(--agent-glow),transparent 46%),
+        linear-gradient(180deg,transparent 0%,rgba(var(--accent-rgb),.025) 44%,rgba(5,13,20,.58) 100%);
+    }
+    .agent-art:before{
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(180deg,rgba(8,16,24,0) 0%,rgba(8,16,24,.04) 55%,rgba(8,16,24,.72) 100%),
+        radial-gradient(circle at 50% 45%,rgba(var(--accent-rgb),.08),transparent 52%);
+      z-index:1;
+    }
+    .agent-portrait{
+      position:absolute;
+      left:0;
+      bottom:-8px;
+      width:100%;
+      height:455px;
+      background-repeat:no-repeat;
+      background-size:var(--portrait-size,145%) auto;
+      background-position:var(--portrait-x,50%) var(--portrait-y,4%);
+      filter:saturate(.98) contrast(1.04);
+      opacity:1;
+      mask-image:linear-gradient(to bottom,transparent 0%,#000 5%,#000 88%,transparent 100%);
+      -webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 5%,#000 88%,transparent 100%);
+      z-index:0;
+      transition:background-size .28s ease,background-position .28s ease,opacity .2s ease;
+    }
+    .agent-sign{
+      position:absolute;
+      left:26px;
+      bottom:62px;
+      z-index:2;
+      color:var(--accent);
+      font-family:'Montserrat','Noto Sans TC',sans-serif;
+      font-size:25px;
+      font-style:italic;
+      font-weight:600;
+      letter-spacing:.02em;
+    }
+    .agent-motto{
+      position:absolute;
+      left:27px;
+      right:18px;
+      bottom:27px;
+      z-index:2;
+      color:#7f919c;
+      font-family:'Montserrat','Noto Sans TC',sans-serif;
+      font-size:7px;
+      letter-spacing:.24em;
+      line-height:1.65;
+    }
+    .agent-motto:after{
+      content:"";
+      display:block;
+      width:23px;
+      height:2px;
+      margin-top:11px;
+      border-radius:999px;
+      background:var(--accent);
+    }
+
+    .main{min-width:0;padding:0 22px 24px}
+    .hero{position:relative;min-height:305px;margin:0 -22px 14px;padding:28px 26px 20px;overflow:hidden;border-bottom:1px solid var(--line)}
+    .hero-bg{position:absolute;inset:0;background:
+      linear-gradient(90deg,rgba(6,14,21,.96) 0%,rgba(6,14,21,.86) 34%,rgba(6,14,21,.38) 62%,rgba(6,14,21,.72) 100%),
+      url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1800&q=85') center/cover no-repeat;transform:scale(1.03)}
+    .hero-bg:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 100%,var(--agent-glow),transparent 28%)}
+    .hero-content{position:relative;z-index:2}
+    .hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+    .map-kicker{font-size:10px;letter-spacing:.24em;color:#9cb0bc;margin-bottom:13px}
+    .map-title{margin:0;font-size:40px;line-height:1.03;font-weight:900;letter-spacing:-.03em}.map-title span{font-weight:400;margin-left:10px}
+    .map-sub{font-size:17px;color:#d8e2e6;margin-top:7px;letter-spacing:.04em}.map-note{font-size:11px;color:#8ba0ac;margin-top:9px;line-height:1.6}
+    .top-tools{display:flex;gap:8px}.icon-btn{width:35px;height:35px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(6,15,23,.62);color:#dce8ec}
+    .hero-script{position:absolute;right:20px;top:75px;color:var(--accent);font-size:28px;font-style:italic;transform:rotate(-6deg);opacity:.8;text-shadow:0 0 25px rgba(var(--accent-rgb),.24)}
+
+    .agent-row{display:flex;gap:19px;align-items:flex-end;margin-top:17px;overflow-x:auto;padding-bottom:3px;scrollbar-width:none}.agent-row::-webkit-scrollbar{display:none}
+    .agent-choice{min-width:52px;text-align:center;background:none;border:0;color:#778b97;padding:0}.avatar{width:48px;height:48px;margin:auto;border-radius:50%;border:1px solid #526572;background:#13212c;display:grid;place-items:center;overflow:hidden;transition:.2s}.avatar img{width:100%;height:100%;object-fit:cover}.agent-choice span{font-size:10px;display:block;margin-top:6px}.agent-choice.active{color:var(--accent)}.agent-choice.active .avatar{border:2px solid var(--accent);box-shadow:0 0 0 4px rgba(var(--accent-rgb),.08),0 0 20px rgba(var(--accent-rgb),.22)}
+
+    .toolbar{display:grid;grid-template-columns:410px minmax(280px,1fr) 126px 126px 44px;gap:10px;margin:14px 0}
+    .segmented{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#0b151e}.seg-btn{border:0;background:transparent;color:#a8b9c2;padding:11px 14px;font-weight:700}.seg-btn.active{background:linear-gradient(180deg,rgba(var(--accent-rgb),.95),rgba(var(--accent-rgb),.76));color:#061316}
+    .search,.select{background:#0b151e;border:1px solid var(--line);border-radius:10px;color:#c8d5db;padding:0 13px;height:44px}.search{width:100%}.select{font-size:11px}
+    .view-btn{height:44px;border-radius:10px;border:1px solid var(--line);background:#0b151e;color:var(--accent)}
+
+    .content-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 292px;gap:12px;align-items:start}
+    .cards{grid-column:1/3;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .card{background:linear-gradient(180deg,rgba(15,27,37,.96),rgba(10,19,28,.96));border:1px solid var(--line);border-radius:11px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.2);transition:.2s}.card:hover{transform:translateY(-2px);border-color:rgba(var(--accent-rgb),.35)}
+    .card-head{padding:12px 13px 9px}.title-row{display:flex;justify-content:space-between;gap:10px;align-items:center}.card h3{margin:0;font-size:17px}.dots{color:#708591}.tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+    .tag{font-size:10px;padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:#152330;color:#c3d0d6}.tag.agent{color:var(--accent);background:var(--accent-soft);border-color:rgba(var(--accent-rgb),.2)}.tag.attack{color:#ff858b;background:rgba(255,102,111,.09);border-color:rgba(255,102,111,.22)}.tag.practice{color:#f5d17b;background:rgba(246,201,104,.09);border-color:rgba(246,201,104,.22)}
+    .preview{position:relative;margin:0 10px;height:180px;border-radius:8px;overflow:hidden;background:
+      linear-gradient(180deg,transparent 48%,rgba(4,9,14,.42)),
+      url('https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=900&q=80') center/cover no-repeat}
+    .preview.smoke:after{content:"";position:absolute;left:48%;top:48%;width:112px;height:70px;border-radius:50%;transform:translate(-50%,-50%);background:radial-gradient(circle at 50% 62%,rgba(var(--accent-rgb),.85),rgba(var(--accent-rgb),.3) 55%,transparent 71%);filter:blur(2px);box-shadow:0 0 35px rgba(var(--accent-rgb),.45)}
+    .play{position:absolute;left:12px;bottom:12px;width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,.9);display:grid;place-items:center;background:rgba(0,0,0,.35);z-index:2}.bookmark{position:absolute;right:11px;top:10px;width:29px;height:29px;border-radius:7px;background:rgba(4,10,15,.62);display:grid;place-items:center;z-index:2}
+    .card-foot{padding:10px 13px 12px}.desc{font-size:10px;color:#a4b4bd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.chip{font-size:9px;color:#80aeb0;background:rgba(var(--accent-rgb),.06);border:1px solid rgba(var(--accent-rgb),.1);border-radius:5px;padding:3px 7px}.detail{margin-left:auto;border:1px solid var(--line);background:#13212c;color:#e7f0f2;border-radius:7px;padding:6px 10px;font-size:10px}.foot-row{display:flex;align-items:center;gap:6px;margin-top:7px}
+
+    .sidecol{display:flex;flex-direction:column;gap:12px}.side-card{background:linear-gradient(180deg,rgba(14,26,36,.96),rgba(9,18,27,.96));border:1px solid var(--line);border-radius:11px;padding:14px}.side-title{font-weight:800;font-size:14px}.side-title small{font-size:9px;color:#728794;font-weight:500;margin-left:5px}.training-head{display:flex;justify-content:space-between;color:#738792;font-size:9px}
+    .progress-wrap{display:flex;gap:15px;align-items:center;margin:14px 0}.ring{width:72px;height:72px;border-radius:50%;background:conic-gradient(var(--accent) 60%,#1b2b36 0);display:grid;place-items:center;position:relative}.ring:before{content:"";position:absolute;width:58px;height:58px;border-radius:50%;background:#0e1b24}.ring b{z-index:2;font-size:19px}.quote{font-size:10px;color:#a7b7bf;line-height:1.65}.quote span{color:#6f828e;font-size:9px}
+    .todo{display:flex;align-items:center;gap:9px;padding:7px 0;border-top:1px solid rgba(148,163,184,.1);font-size:10px}.check{width:14px;height:14px;border-radius:3px;border:1px solid #566b78;display:grid;place-items:center}.check.done{background:var(--accent);border-color:var(--accent);color:#071419}.todo .arrow{margin-left:auto;color:#768b96}.start{width:100%;margin-top:10px;border:0;border-radius:7px;padding:10px;background:var(--accent);color:#071419;font-weight:900;box-shadow:none}
+    .calendar-head{display:flex;align-items:center;justify-content:space-between;margin:12px 0 10px;font-size:11px}.dow,.days{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;gap:4px}.dow{font-size:8px;color:#6b7f8a}.days{font-size:9px}.day{height:23px;display:grid;place-items:center;color:#b8c6cd;border-radius:50%}.day.mark:after{content:"";width:4px;height:4px;border-radius:50%;background:var(--accent);position:absolute;transform:translateY(8px)}.day.today{outline:1px solid var(--accent);color:var(--accent);background:rgba(var(--accent-rgb),.08)}
+    .footer-note{font-size:9px;color:#647883;margin-top:11px;text-align:right}
+
+    @media(max-width:1200px){:root{--sidebar:178px}.toolbar{grid-template-columns:1fr 1fr 110px 110px 42px}.content-grid{grid-template-columns:1fr}.cards{grid-column:auto}.sidecol{display:grid;grid-template-columns:1fr 1fr}.agent-art{display:none}}
+    @media(max-width:820px){.app{display:block}.sidebar{position:relative;height:auto}.brand{padding:18px}.nav{flex-direction:row;overflow-x:auto}.nav-item{min-width:130px}.agent-art{display:none}.main{padding:0 12px 20px}.hero{margin:0 -12px 10px;padding:22px 18px}.map-title{font-size:32px}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/3}.toolbar .select,.toolbar .view-btn{display:none}.content-grid{display:block}.cards{grid-template-columns:1fr}.sidecol{grid-template-columns:1fr;margin-top:12px}}
+
+    /* Functional overlays — deliberately separate from the locked V19 layout */
+    .modal-overlay{position:fixed;inset:0;background:rgba(2,7,12,.82);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:18px;z-index:100}
+    .modal-overlay.open{display:flex}.modal-box{width:min(920px,96vw);max-height:92vh;overflow:auto;background:#0b151e;border:1px solid rgba(148,163,184,.18);border-radius:16px;box-shadow:0 28px 90px rgba(0,0,0,.55);padding:18px}.modal-box.small{width:min(560px,94vw)}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:13px;border-bottom:1px solid var(--line);margin-bottom:15px}.modal-head h3{margin:0;font-size:16px}.modal-close{width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:#111e28;color:#d6e2e6}
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.form-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:10px;color:#879ba7}.field input,.field select,.field textarea{width:100%;background:#0d1a24;border:1px solid #263746;color:#e8f0f2;border-radius:9px;padding:10px 11px;outline:none}.field textarea{min-height:76px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(var(--accent-rgb),.55);box-shadow:0 0 0 3px rgba(var(--accent-rgb),.07)}
+    .basic-title{font-size:10px;color:var(--accent);font-weight:900;letter-spacing:.12em;margin:4px 0 10px}.steps-editor{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.step-card{border:1px solid var(--line);background:#0a141d;border-radius:12px;padding:13px}.step-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:12px;margin-bottom:10px}.step-num{width:24px;height:24px;border-radius:7px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:10px}.step-preview{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-top:8px;border:1px solid var(--line);display:none}.step-preview.show{display:block}
+    .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}.btn{border:1px solid var(--line);background:#13212c;color:#dce7eb;border-radius:8px;padding:9px 13px;font-weight:700;font-size:11px}.btn.primary{background:linear-gradient(180deg,rgba(var(--accent-rgb),.95),rgba(var(--accent-rgb),.76));color:#061316;border-color:transparent}.btn.danger{color:#ff8a90}.btn.small{padding:6px 9px;font-size:10px}
+    .control-menu{position:fixed;z-index:90;min-width:210px;background:#0b151e;border:1px solid var(--line);border-radius:12px;padding:7px;box-shadow:0 18px 55px rgba(0,0,0,.45);display:none}.control-menu.open{display:block}.control-menu button,.control-menu label{width:100%;display:flex;align-items:center;gap:8px;border:0;background:transparent;color:#b9c8cf;padding:9px 10px;border-radius:8px;font-size:11px;text-align:left;cursor:pointer}.control-menu button:hover,.control-menu label:hover{background:rgba(var(--accent-rgb),.08);color:var(--accent)}
+    .map-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.map-pick{border:1px solid var(--line);background:#101c26;color:#c6d3d8;border-radius:9px;padding:10px;font-size:11px}.map-pick.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+    .detail-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:12px}.detail-steps{display:grid;grid-template-columns:1fr 1fr;gap:12px}.detail-step{border:1px solid var(--line);background:#0a141d;border-radius:12px;overflow:hidden}.detail-step img{width:100%;height:190px;object-fit:cover;display:block;cursor:zoom-in}.detail-step .copy{padding:12px}.detail-step h4{margin:0 0 6px;font-size:12px;color:var(--accent)}.detail-step p{margin:0;color:#a7b7bf;font-size:11px;line-height:1.6;white-space:pre-wrap}
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;z-index:150;padding:22px}.lightbox.open{display:flex}.lightbox img{max-width:94vw;max-height:90vh;object-fit:contain;border-radius:10px}.lightbox button{position:absolute;top:20px;right:20px}
+    .tracker-frame{width:100%;height:min(78vh,800px);border:0;border-radius:10px;background:#fff}.tracker-tools{display:flex;gap:8px}
+    .clickable-map{cursor:pointer}.clickable-map:hover{color:var(--accent)}
+    .card-tools{display:flex;align-items:center;gap:7px;margin-left:auto}.tiny-action{border:0;background:transparent;color:#718691;padding:0;font-size:13px}.tiny-action.on{color:#f4c85e}.tiny-action:hover{color:var(--accent)}
+    .training-mode{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px}.training-items{display:flex;flex-direction:column}.training-edit-row{display:flex;gap:8px;margin-top:10px}.training-edit-row input{flex:1;background:#0d1a24;border:1px solid #263746;color:#fff;border-radius:8px;padding:9px}
+    .hidden-file{display:none}.edit-badge{display:none}.edit-mode .edit-badge{display:inline-flex}
+    @media(max-width:820px){.form-grid,.form-grid.three,.steps-editor,.detail-steps{grid-template-columns:1fr}.map-grid{grid-template-columns:1fr 1fr}}
+
+    /* V22: visible map selector + restored quick actions */
+    .map-section{margin:10px 0 12px;background:linear-gradient(180deg,rgba(13,24,33,.88),rgba(9,18,26,.82));border:1px solid var(--line);border-radius:11px;padding:11px 12px}
+    .map-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}
+    .map-section-title{font-size:10px;color:#8499a5;font-weight:800;letter-spacing:.13em}
+    .quick-actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+    .quick-btn{border:1px solid var(--line);background:#101c26;color:#bccbd2;border-radius:8px;padding:7px 10px;font-size:10px;font-weight:800}
+    .quick-btn:hover{border-color:rgba(var(--accent-rgb),.35);color:var(--accent)}
+    .quick-btn.primary{background:linear-gradient(180deg,rgba(var(--accent-rgb),.92),rgba(var(--accent-rgb),.74));border-color:transparent;color:#071318}
+    .map-tabs{display:flex;flex-wrap:wrap;gap:7px;overflow:visible}
+    .map-tab{border:1px solid #263946;background:#0d1821;color:#aebec6;border-radius:8px;padding:7px 10px;font-size:10px;white-space:nowrap;transition:.18s}
+    .map-tab:hover{color:#fff;border-color:#415867}.map-tab.active{color:var(--accent);border-color:rgba(var(--accent-rgb),.6);background:rgba(var(--accent-rgb),.08);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.05)}
+
+    /* Calendar: compact rounded-square dates, not ovals */
+    .days{gap:5px 3px}.day{width:30px;height:30px;justify-self:center;border-radius:9px;display:grid;place-items:center;color:#9caeb8;position:relative;border:1px solid transparent;font-size:9px;line-height:1}
+    .day.signed{color:var(--accent);border-color:rgba(var(--accent-rgb),.45);background:rgba(var(--accent-rgb),.06);font-weight:800}
+    .day.signed:after{content:"";position:absolute;bottom:3px;left:50%;width:4px;height:4px;border-radius:50%;background:var(--accent);transform:translateX(-50%)}
+    .day.today{color:#f4cf5f;border-color:#9a7510;background:rgba(244,207,95,.05);font-weight:900}
+    .day.today:after{content:"";position:absolute;bottom:3px;left:50%;width:4px;height:4px;border-radius:50%;background:#f4cf5f;transform:translateX(-50%)}
+    .day.today.signed{color:var(--accent);border-color:var(--accent);background:rgba(var(--accent-rgb),.07)}
+    .day.today.signed:after{background:var(--accent)}
+    .calendar-legend{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:11px;color:#6f838f;font-size:9px}
+    .legend-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}.legend-dot.signed{background:var(--accent)}.legend-today{width:15px;height:15px;border:1px solid #9a7510;border-radius:5px;display:inline-block;vertical-align:-3px;margin-right:4px}.legend-dot.none{background:#344650}
+
+    /* Training detail list */
+    .training-full-list{display:flex;flex-direction:column;gap:8px}.training-task{border:1px solid var(--line);border-radius:10px;background:#0a151e;padding:10px 11px;display:grid;grid-template-columns:20px 1fr auto;gap:10px;align-items:flex-start}.training-task .check{margin-top:1px}.training-task-title{font-size:11px;font-weight:800;color:#dbe6ea;line-height:1.45}.training-task-detail{font-size:9px;color:#7f939e;line-height:1.55;margin-top:4px;white-space:normal}.training-index{font-size:9px;color:var(--accent);font-weight:900;padding-top:2px}.training-summary{font-size:9px;color:#758995;margin-top:8px}.training-card-more{width:100%;margin-top:10px;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px;background:#0f1a23;color:#d7e4e8;font-weight:700;box-shadow:none}.training-card-more:hover{color:var(--accent);border-color:rgba(var(--accent-rgb),.35)}
+    @media(max-width:820px){.map-section-head{align-items:flex-start;flex-direction:column}.quick-actions{justify-content:flex-start}.map-tabs{gap:6px}.map-tab{font-size:9px;padding:6px 8px}}
+
+  
+
+    /* === V23 TRAINING FULL PAGE === */
+    .page-view{display:none}.page-view.active{display:block}
+    .training-page{padding:0 0 28px}
+    .training-hero{position:relative;min-height:238px;margin:0 -22px 18px;padding:34px 30px 26px;overflow:hidden;border:1px solid rgba(255,255,255,.04);border-left:0;border-right:0;background:
+      linear-gradient(90deg,rgba(7,17,25,.95) 0%,rgba(7,17,25,.88) 35%,rgba(7,17,25,.38) 100%),
+      radial-gradient(circle at 85% 12%, rgba(var(--accent-rgb),.20), transparent 24%),
+      radial-gradient(circle at 18% 85%, rgba(var(--accent-rgb),.12), transparent 28%),
+      linear-gradient(180deg,#0a131b,#09131c 60%,#09131b 100%)}
+    .training-hero:before{content:"";position:absolute;inset:auto -40px -90px auto;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(var(--accent-rgb),.16),transparent 62%);filter:blur(14px)}
+    .training-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(255,255,255,.02) 100%);pointer-events:none}
+    .training-hero-inner{position:relative;z-index:1;max-width:960px}
+    .training-kicker{font-size:11px;letter-spacing:.20em;color:#89a0ad;margin-bottom:12px}
+    .training-title{margin:0;font-size:44px;line-height:1.02;font-weight:900;letter-spacing:-.03em}.training-title span{font-weight:500;color:var(--accent)}
+    .training-subtitle{margin-top:10px;font-size:17px;color:#e5eff2;font-weight:700}.training-en{font-size:12px;color:#92a4af;margin-top:7px;letter-spacing:.03em}
+    .benefit-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:22px}.benefit{display:flex;gap:10px;align-items:center;min-width:170px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);backdrop-filter:blur(6px)}.benefit-ico{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;border:1px solid rgba(var(--accent-rgb),.38);color:var(--accent);background:rgba(var(--accent-rgb),.07);font-size:17px}.benefit b{display:block;font-size:12px}.benefit small{display:block;font-size:9px;color:#7b8f9a;margin-top:2px}
+
+    .training-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+    .training-groups{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+    .training-group{background:linear-gradient(180deg,rgba(15,28,38,.98),rgba(10,19,28,.98));border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:14px;box-shadow:0 18px 40px rgba(0,0,0,.20)}
+    .training-group-head{display:flex;align-items:center;gap:10px;padding:0 2px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .training-group-no{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.30);font-size:18px;line-height:1;color:var(--accent);font-weight:900;letter-spacing:.02em}
+    .training-group-title{font-size:18px;font-weight:900;color:#eff6f7}.training-group-en{font-size:10px;color:#7d919c;display:block;margin-top:3px}.training-group-time{margin-left:auto;font-size:11px;color:#8ea1ab;white-space:nowrap;padding:7px 10px;border-radius:999px;background:#111e27;border:1px solid rgba(255,255,255,.05)}
+    .training-drills{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+    .training-drill{display:grid;grid-template-columns:132px minmax(0,1fr) 40px;gap:12px;align-items:center;padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(14,28,38,.90),rgba(11,21,30,.92));transition:.18s;position:relative;overflow:hidden}
+    .training-drill:hover{border-color:rgba(var(--accent-rgb),.30);background:linear-gradient(180deg,rgba(var(--accent-rgb),.05),rgba(14,29,39,.92))}
+    .training-drill.done{border-color:rgba(var(--accent-rgb),.34);background:linear-gradient(90deg,rgba(var(--accent-rgb),.10),rgba(14,29,39,.92))}
+    .training-drill.done:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+    .drill-thumb{height:88px;border-radius:12px;position:relative;overflow:hidden;background:
+      radial-gradient(circle at 75% 34%,rgba(255,255,255,.78) 0 2px, transparent 3px),
+      radial-gradient(circle at 77% 36%,rgba(255,90,90,.40) 0 11px, transparent 13px),
+      linear-gradient(140deg,#223443 0%,#162632 58%,#101a22 100%);border:1px solid rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
+    .drill-thumb:before{content:"";position:absolute;left:10px;right:10px;top:14px;bottom:14px;border-radius:10px;background:repeating-linear-gradient(90deg,rgba(var(--accent-rgb),.05) 0 22px,rgba(var(--accent-rgb),.18) 22px 24px);opacity:.6}
+    .drill-thumb:after{content:"";position:absolute;left:16px;bottom:12px;width:42px;height:26px;border-radius:8px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.08)}
+    .drill-badge{position:absolute;left:8px;top:8px;z-index:2;min-width:32px;height:28px;padding:0 8px;border-radius:9px;display:grid;place-items:center;background:rgba(6,15,22,.72);border:1px solid rgba(var(--accent-rgb),.26);color:var(--accent);font-weight:900;font-size:12px;backdrop-filter:blur(3px)}
+    .drill-copy h4{margin:0;font-size:15px;line-height:1.38;color:#f1f7f8}.drill-copy p{margin:5px 0 0;font-size:11px;line-height:1.58;color:#8ca0ab}.drill-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}.meta-pill{font-size:9px;padding:4px 8px;border-radius:999px;background:rgba(var(--accent-rgb),.08);border:1px solid rgba(var(--accent-rgb),.16);color:#a7e0db}
+    .drill-check{width:36px;height:36px;border-radius:50%;border:1px solid #516874;background:#0d1821;color:#93a5b0;display:grid;place-items:center;font-size:15px;transition:.16s}.training-drill.done .drill-check{background:var(--accent);border-color:var(--accent);color:#061316;font-weight:900}
+
+    .training-right{display:flex;flex-direction:column;gap:14px;position:sticky;top:12px}
+    .training-summary-card,.training-calendar-card,.training-tools-card{background:linear-gradient(180deg,rgba(14,27,37,.98),rgba(9,19,28,.98));border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:16px;box-shadow:0 14px 36px rgba(0,0,0,.18)}
+    .summary-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}.summary-title{font-size:16px;font-weight:900;line-height:1.25}.summary-title small{display:block;font-size:11px;font-weight:500;color:#78909d;margin-top:3px}.summary-percent{color:var(--accent);font-size:30px;font-weight:900;line-height:1}
+    .summary-shell{margin-top:12px;padding:14px;border-radius:15px;background:linear-gradient(180deg,rgba(10,20,28,.84),rgba(13,24,33,.98));border:1px solid rgba(255,255,255,.07)}
+    .summary-progress{display:grid;grid-template-columns:114px 1fr;gap:16px;align-items:center}.summary-ring{width:100px;height:100px;border-radius:50%;display:grid;place-items:center;position:relative;background:conic-gradient(var(--accent) var(--p,0%),#2a3b45 0)}.summary-ring:after{content:"";position:absolute;width:76px;height:76px;border-radius:50%;background:#0c1821}.summary-ring .summary-main{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;line-height:1}.summary-ring b{font-size:28px}.summary-ring em{font-style:normal;font-size:10px;color:#8ca0ab;margin-top:5px}.summary-quote{font-size:12px;color:#dce8ec;line-height:1.7}.summary-quote span{display:block;margin-top:7px;font-size:11px;color:#7d919c}
+    .summary-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}.stat-box{padding:11px 12px;border-radius:12px;background:#101d27;border:1px solid rgba(255,255,255,.06)}.stat-label{font-size:10px;color:#728793;line-height:1.4}.stat-value{font-size:16px;font-weight:900;margin-top:5px;color:#e8f1f3}.stat-value.accent{color:var(--accent)}.training-main-btn{width:100%;margin-top:14px;border:0;border-radius:10px;padding:14px;background:var(--accent);color:#071318;font-size:15px;font-weight:900;box-shadow:none}
+    .training-calendar-card .side-title{font-size:16px}.training-calendar-card .side-title small{font-size:11px;color:#78909d;margin-left:6px}.training-calendar-card .calendar-head{font-size:14px;margin:14px 4px 12px}.training-calendar-card .calendar-head b{font-size:14px}.training-calendar-card .dow{font-size:10px;margin-bottom:8px}.training-calendar-card .days{font-size:11px;gap:9px}.training-calendar-card .day{height:36px;width:36px;margin:auto;aspect-ratio:1/1;border-radius:12px;display:grid;place-items:center;border:1px solid transparent;color:#dce6ea;position:relative}
+    .training-calendar-card .day.today{border-color:#f1c644;color:#ffd85a;background:rgba(241,198,68,.06)}
+    .training-calendar-card .day.today:after{content:"";position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#ffd85a}
+    .training-calendar-card .day.signed{background:rgba(var(--accent-rgb),.12);border-color:rgba(var(--accent-rgb),.70);color:var(--accent);box-shadow:0 0 0 1px rgba(var(--accent-rgb),.15) inset}
+    .training-calendar-card .day.signed:after{content:"";position:absolute;bottom:5px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent)}
+    .training-calendar-card .day.signed.today{border-color:var(--accent);background:rgba(var(--accent-rgb),.14);color:var(--accent)}
+    .training-calendar-card .calendar-legend{margin-top:14px;font-size:10px;display:flex;gap:14px;flex-wrap:wrap}
+    .quick-tool{display:flex;align-items:center;gap:10px;padding:12px 11px;border:1px solid rgba(255,255,255,.06);border-radius:12px;background:#0e1b24;color:#d8e4e8;margin-top:9px;text-align:left}.quick-tool span:first-child{color:var(--accent);font-size:18px}.quick-tool b{font-size:12px;display:block}.quick-tool small{font-size:10px;color:#718692;display:block;margin-top:2px}
+    @media(max-width:1220px){.training-layout{grid-template-columns:1fr}.training-right{position:static;display:grid;grid-template-columns:1fr 1fr}.training-tools-card{grid-column:1/-1}}
+    @media(max-width:920px){.training-groups{grid-template-columns:1fr}.training-right{grid-template-columns:1fr}.training-tools-card{grid-column:auto}.training-title{font-size:34px}.training-drill{grid-template-columns:108px minmax(0,1fr) 36px}.drill-thumb{height:78px}.summary-progress{grid-template-columns:100px 1fr}}
+
+
+
+    /* === V27 FLAT BUTTON SYSTEM + TYPOGRAPHY === */
+    html,body,button,input,select,textarea{font-family:'Montserrat','Noto Sans TC',sans-serif}
+
+    /* No shadows / gradients / glow on any clickable button surface */
+    button,
+    .btn,.quick-btn,.map-tab,.map-pick,.view-btn,.detail,.start,
+    .training-card-more,.quick-tool,.drill-check,.icon-btn,.modal-close,
+    .control-menu button,.control-menu label,.tiny-action{
+      background-image:none !important;
+      box-shadow:none !important;
+      text-shadow:none !important;
+      filter:none !important;
+    }
+
+    /* Neutral / secondary button blocks */
+    .icon-btn,.view-btn,.detail,.btn,.quick-btn,.map-tab,.map-pick,
+    .training-card-more,.quick-tool,.modal-close,.drill-check,
+    .control-menu button,.control-menu label{
+      background:#101c26 !important;
+      border-color:#263946 !important;
+      color:#d7e3e8 !important;
+    }
+
+    /* Main action = solid agent accent */
+    .btn.primary,.quick-btn.primary,.seg-btn.active,.start,.training-main-btn,
+    .map-tab.active,.map-pick.active,.training-drill.done .drill-check{
+      background:var(--accent) !important;
+      border-color:var(--accent) !important;
+      color:#071318 !important;
+    }
+
+    /* Segment buttons also use solid blocks */
+    .segmented{background:#0b151e !important;box-shadow:none !important}
+    .seg-btn{
+      background:#101c26 !important;
+      color:#aebec6 !important;
+      box-shadow:none !important;
+    }
+    .seg-btn.active{color:#071318 !important}
+
+    /* Small card action buttons */
+    .tiny-action{
+      width:28px;
+      height:28px;
+      border-radius:7px;
+      border:1px solid #263946 !important;
+      background:#101c26 !important;
+      color:#8ea1ab !important;
+      display:grid;
+      place-items:center;
+      padding:0 !important;
+    }
+    .tiny-action.on{background:#2c2613 !important;border-color:#5b4c1f !important;color:#f4c85e !important}
+    .tiny-action:hover{background:#152630 !important;color:var(--accent) !important}
+
+    /* Solid hover states only */
+    .quick-btn:hover,.map-tab:hover,.map-pick:hover,.detail:hover,.btn:hover,
+    .training-card-more:hover,.quick-tool:hover,.icon-btn:hover,.modal-close:hover,
+    .view-btn:hover,.control-menu button:hover,.control-menu label:hover{
+      background:#152630 !important;
+      border-color:#35505f !important;
+      color:#ffffff !important;
+    }
+    .btn.primary:hover,.quick-btn.primary:hover,.start:hover,.training-main-btn:hover,
+    .map-tab.active:hover,.map-pick.active:hover,.seg-btn.active:hover{
+      background:var(--accent) !important;
+      border-color:var(--accent) !important;
+      color:#071318 !important;
+    }
+
+    /* Remove selected-agent glow; keep clean ring only */
+    .agent-choice.active .avatar{box-shadow:none !important}
+
+    /* Keep control surfaces flat */
+    .training-main-btn,.start{box-shadow:none !important}
+
+
+    /* === V28 CLEAN NAV + GLOSSARY === */
+    .settings-btn{font-size:17px}
+    .settings-menu-title{padding:8px 10px 10px;color:#eff6f7;font-weight:900;font-size:13px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:5px}
+    .settings-menu-title span{font-family:'Montserrat',sans-serif;font-size:9px;font-weight:600;color:#728793;margin-left:5px}
+    .toolbar{grid-template-columns:410px minmax(320px,1fr) 126px 126px}
+    .map-kicker{cursor:default}
+    .map-title{cursor:default}
+
+    .glossary-page{padding-bottom:30px}
+    .glossary-hero{position:relative;margin:0 -22px 18px;padding:34px 30px 30px;border-bottom:1px solid var(--line);overflow:hidden;background:
+      radial-gradient(circle at 82% 10%,rgba(var(--accent-rgb),.12),transparent 28%),
+      linear-gradient(180deg,#0b151e,#09121a)}
+    .glossary-hero:after{content:"Aa";position:absolute;right:35px;top:8px;font-family:'Montserrat',sans-serif;font-size:150px;font-weight:800;line-height:1;color:rgba(var(--accent-rgb),.035);pointer-events:none}
+    .glossary-kicker{font-family:'Montserrat',sans-serif;font-size:10px;letter-spacing:.22em;color:#8aa0ab;margin-bottom:12px}
+    .glossary-title{margin:0;font-size:40px;font-weight:900;letter-spacing:-.03em}
+    .glossary-title span{font-family:'Montserrat',sans-serif;font-weight:500;color:var(--accent);margin-left:10px}
+    .glossary-sub{max-width:680px;margin:10px 0 0;color:#90a3ad;font-size:12px;line-height:1.7}
+    .glossary-search-wrap{margin-top:20px;max-width:620px}
+    .glossary-search{width:100%;height:46px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:#101d27;color:#e9f2f4;padding:0 15px;outline:none}
+    .glossary-search:focus{border-color:rgba(var(--accent-rgb),.45)}
+    .glossary-controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+    .glossary-filter{border:1px solid rgba(255,255,255,.07);background:#101d27;color:#9cafb8;border-radius:9px;padding:9px 13px;font-weight:700}
+    .glossary-filter.active{background:var(--accent);color:#071318;border-color:var(--accent)}
+    .glossary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+    .glossary-card{background:linear-gradient(180deg,#0f1c26,#0b151e);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:15px;min-height:122px}
+    .glossary-card:hover{border-color:rgba(var(--accent-rgb),.28)}
+    .glossary-card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .glossary-term{font-family:'Montserrat',sans-serif;font-size:17px;font-weight:800;color:#f2f7f8}
+    .glossary-cn{font-size:13px;font-weight:800;color:var(--accent);margin-top:5px}
+    .glossary-cat{font-family:'Montserrat',sans-serif;font-size:8px;letter-spacing:.08em;color:#718691;border:1px solid rgba(255,255,255,.06);border-radius:999px;padding:4px 7px;white-space:nowrap}
+    .glossary-desc{font-size:11px;color:#8296a1;line-height:1.6;margin-top:10px}
+    .glossary-empty{grid-column:1/-1;padding:50px;text-align:center;color:#708591;border:1px dashed rgba(255,255,255,.08);border-radius:14px}
+    @media(max-width:1100px){.glossary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:720px){.glossary-grid{grid-template-columns:1fr}.glossary-title{font-size:32px}.glossary-title span{display:block;margin:5px 0 0}.toolbar{grid-template-columns:1fr 1fr}.toolbar .search{grid-column:1/-1}.toolbar .select{display:none}}
+
+
+    /* === V33 AGENT AVATAR TUNING === */
+    .agent-choice .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    /* Viper 小頭貼 */
+    .agent-choice[data-agent="Viper"] .avatar img{
+      transform:scale(1.22);
+      object-position:50% 50%;
+    }
+
+    /* Omen 小頭貼 */
+    .agent-choice[data-agent="Omen"] .avatar img{
+      transform:scale(1.15);
+      object-position:50% 48%;
+    }
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo-mark"></div><h1>VALORANT LAB</h1><small>LINEUPS · TRAINING · GLOSSARY</small></div>
+    <nav class="nav">
+      <a class="nav-item" href="#" id="trainingNav"><span class="nav-ico">◉</span><span class="nav-copy"><b>練槍</b><span>Training</span></span></a>
+      <a class="nav-item active" href="#" id="lineupNav"><span class="nav-ico">●</span><span class="nav-copy"><b>Lineup 點位</b><span>Lineup</span></span></a>
+      <a class="nav-item" href="#" id="glossaryNav"><span class="nav-ico">Aa</span><span class="nav-copy"><b>術語</b><span>Glossary</span></span></a>
+      <a class="nav-item" href="#" id="trackerNav"><span class="nav-ico">▣</span><span class="nav-copy"><b>戰績</b><span>Tracker</span></span></a>
+    </nav>
+    <div class="agent-art"><div id="agentPortrait" class="agent-portrait"></div><div id="agentSign" class="agent-sign">Viper</div><div class="agent-motto">SAME SKIES · DIFFERENT ANGLES.</div></div>
+  </aside>
+
+  <main class="main">
+    <section class="page-view active" id="lineupPage">
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <div class="hero-top">
+          <div>
+            <div class="map-kicker">✕ MAP</div>
+            <h2 class="map-title"><span id="mapZh">熱帶樂園</span> <span id="mapEn">Breeze</span></h2>
+            <div id="notebookTitle" class="map-sub">Viper Lineup Notebook</div>
+            <div class="map-note">陽光下的致命毒霧，掌控整座島嶼。<br>Same skies. Different angles.</div>
+          </div>
+          <div class="top-tools"><button class="icon-btn settings-btn" id="settingsBtn" title="Settings">⚙</button></div>
+        </div>
+        <div class="hero-script">Breeze</div>
+
+        <div class="agent-row" id="agentRow">
+          <button class="agent-choice active" data-agent="Viper"><span class="avatar"><img src="Viper-avatar.png" alt="Viper"></span><span>Viper</span></button>
+          <button class="agent-choice" data-agent="Omen"><span class="avatar"><img src="Omen-avatar.png" alt="Omen"></span><span>Omen</span></button>
+          <button class="agent-choice" data-agent="Killjoy"><span class="avatar">K</span><span>Killjoy</span></button>
+          <button class="agent-choice" data-agent="Cypher"><span class="avatar"><img src="https://media.valorant-api.com/agents/117ed9e3-49f3-6512-3ccf-0cada7e3823b/displayicon.png" alt="Cypher"></span><span>Cypher</span></button>
+          <button class="agent-choice" data-agent="Miks"><span class="avatar">M</span><span>Miks</span></button>
+          <button class="agent-choice" data-agent="Skye"><span class="avatar">S</span><span>Skye</span></button>
+          <button class="agent-choice" data-agent="Sage"><span class="avatar">S</span><span>Sage</span></button>
+          <button class="agent-choice" data-agent="Fade"><span class="avatar">F</span><span>Fade</span></button>
+          <button class="agent-choice" data-agent="Vyse"><span class="avatar">V</span><span>Vyse</span></button>
+          <button class="agent-choice" id="moreAgents"><span class="avatar">•••</span><span>更多特務</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="map-section">
+      <div class="map-section-head">
+        <div class="map-section-title">地圖 MAP</div>
+        <div class="quick-actions">
+          <button class="quick-btn" id="quickModeBtn">👁 瀏覽 VIEW</button>
+          <button class="quick-btn" id="quickAddMapBtn">＋ 新增地圖</button>
+          <button class="quick-btn primary" id="quickAddLineupBtn">＋ 新增 LINEUP</button>
+        </div>
+      </div>
+      <div class="map-tabs" id="mapTabs"></div>
+    </section>
+
+    <section class="toolbar">
+      <div class="segmented"><button class="seg-btn active" id="attackBtn">⚔ 進攻 Attack</button><button class="seg-btn" id="defenseBtn">◈ 防守 Defense</button></div>
+      <input class="search" id="lineupSearch" placeholder="⌕  搜尋 lineup...（例：A Main、煙球、毒牆）">
+      <select class="select" id="masteryFilter"><option value="all">全部熟練度</option><option>練習中</option><option>熟悉</option><option>熟練</option></select>
+      <select class="select" id="favoriteFilter"><option value="all">全部 LINEUP</option><option value="fav">★ 只看收藏</option></select>
+    </section>
+
+    <section class="content-grid">
+      <div id="cards" class="cards"></div>
+      <aside class="sidecol">
+        <section class="side-card" id="trainingCard">
+          <div class="training-head"><div class="side-title">今日訓練 <small>Today's Training</small></div><span>2026.09.24</span></div>
+          <div class="progress-wrap"><div class="ring"><b>3/6</b></div><div class="quote">「持續練習，讓每一顆煙都更精準。」<br><span>Small practice. Big difference.</span></div></div>
+          <div class="todo"><span class="check done">✓</span><span>A Main 煙球（進攻）</span><span class="arrow">→</span></div>
+          <div class="todo"><span class="check done">✓</span><span>B Main 煙球（進攻）</span><span class="arrow">→</span></div>
+          <div class="todo"><span class="check"></span><span>A Site 煙球（進攻）</span><span class="arrow">→</span></div>
+          <div class="todo"><span class="check"></span><span>Mid 煙球（進攻）</span><span class="arrow">→</span></div>
+          <div class="todo"><span class="check"></span><span>B Site 進點煙（進攻）</span><span class="arrow">→</span></div>
+          <div class="todo"><span class="check"></span><span>A Site 後包煙（防守）</span><span class="arrow">→</span></div>
+          <button class="start">▶ 開始訓練　Start Training</button>
+        </section>
+        <section class="side-card">
+          <div class="side-title">訓練紀錄 <small>Training Calendar</small></div>
+          <div class="calendar-head"><span>‹</span><b>2026 年 9 月</b><span>›</span></div>
+          <div class="dow"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+          <div class="days" id="calendar"></div>
+          <div class="calendar-legend"><span><i class="legend-dot signed"></i>已簽到</span><span><i class="legend-today"></i>今天</span><span><i class="legend-dot none"></i>未簽到</span></div>
+        </section>
+      </aside>
+    </section>
+    </section>
+
+    <section class="page-view" id="trainingPage">
+      <div class="training-page">
+        <section class="training-hero">
+          <div class="training-hero-inner">
+            <div class="training-kicker">※ TRAINING</div>
+            <h2 class="training-title">每日練槍菜單 <span>Training Routine</span></h2>
+            <div class="training-subtitle">持之以恆，讓準度成為本能。</div>
+            <div class="training-en">Consistency builds better aim.</div>
+            <div class="benefit-row">
+              <div class="benefit"><div class="benefit-ico">◎</div><div><b>更好的槍法</b><small>Better Aim</small></div></div>
+              <div class="benefit"><div class="benefit-ico">↗</div><div><b>穩定的發揮</b><small>More Consistent</small></div></div>
+              <div class="benefit"><div class="benefit-ico">△</div><div><b>實戰更有自信</b><small>More Confidence</small></div></div>
+              <div class="benefit"><div class="benefit-ico">☆</div><div><b>每天進步一點</b><small>A Little Better Everyday</small></div></div>
+            </div>
+          </div>
+        </section>
+        <div class="training-layout">
+          <div class="training-groups" id="trainingGroups"></div>
+          <aside class="training-right">
+            <section class="training-summary-card" id="trainingSummaryCard"></section>
+            <section class="training-calendar-card">
+              <div class="side-title">訓練日曆 <small>Training Calendar</small></div>
+              <div class="calendar-head"><span>‹</span><b id="trainingCalendarTitle">2026 年 9 月</b><span>›</span></div>
+              <div class="dow"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div>
+              <div class="days" id="trainingCalendar"></div>
+              <div class="calendar-legend"><span><i class="legend-dot signed"></i>已簽到</span><span><i class="legend-today"></i>今天</span><span><i class="legend-dot none"></i>未簽到</span></div>
+            </section>
+            <section class="training-tools-card">
+              <div class="side-title">快速工具 <small>Quick Tools</small></div>
+              <button class="quick-tool" onclick="alert('這顆之後可以接你常用的練習場入口或備註。')"><span>▶</span><span><b>進入練習場</b><small>Open Range</small></span></button>
+              <button class="quick-tool" onclick="alert('這顆之後可以放你的準心、靈敏度、解析度設定。')"><span>⚙</span><span><b>練習設定</b><small>Practice Settings</small></span></button>
+              <button class="quick-tool" onclick="alert('這顆之後可以整理遊戲內練習設定建議。')"><span>🎮</span><span><b>遊戲內設定建議</b><small>Game Settings Tips</small></span></button>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="page-view" id="glossaryPage">
+      <div class="glossary-page">
+        <section class="glossary-hero">
+          <div class="glossary-kicker">Aa · GLOSSARY</div>
+          <h2 class="glossary-title">特戰術語 <span>Valorant Glossary</span></h2>
+          <p class="glossary-sub">把常見英文 Callout、槍法與戰術用語整理在一起。看到不熟的詞，直接來這裡查。</p>
+          <div class="glossary-search-wrap">
+            <input id="glossarySearch" class="glossary-search" placeholder="搜尋術語，例如：Spike、Retake、爆頭線…">
+          </div>
+        </section>
+        <section class="glossary-controls" id="glossaryFilters">
+          <button class="glossary-filter active" data-cat="全部">全部 All</button>
+          <button class="glossary-filter" data-cat="目標">目標 Objective</button>
+          <button class="glossary-filter" data-cat="地圖">地圖 Map</button>
+          <button class="glossary-filter" data-cat="進攻防守">攻防 Tactics</button>
+          <button class="glossary-filter" data-cat="槍法">槍法 Aim</button>
+          <button class="glossary-filter" data-cat="技能經濟">技能 / 經濟 Utility</button>
+        </section>
+        <section class="glossary-grid" id="glossaryGrid"></section>
+      </div>
+    </section>
+  </main>
+</div>
+
+
+<div class="control-menu" id="controlMenu">
+  <div class="settings-menu-title">設定 <span>Settings</span></div>
+  <button id="settingsAddMapBtn">＋ 新增地圖</button>
+  <button id="exportBtn">⇩ 匯出備份 JSON</button>
+  <label>⇧ 匯入備份 JSON<input class="hidden-file" id="importFile" type="file" accept="application/json"></label>
+  <button id="trackerSettingsBtn">▣ Tracker 設定</button>
+</div>
+
+<div class="modal-overlay" id="mapModal"><div class="modal-box small"><div class="modal-head"><h3>選擇地圖 Map</h3><button class="modal-close" data-close="mapModal">✕</button></div><div class="map-grid" id="mapGrid"></div></div></div>
+
+<div class="modal-overlay" id="lineupModal"><div class="modal-box"><div class="modal-head"><h3 id="lineupModalTitle">新增 LINEUP 筆記</h3><button class="modal-close" data-close="lineupModal">✕</button></div>
+<form id="lineupForm">
+  <input type="hidden" id="editId"><div class="basic-title">基本資料 BASIC INFO</div>
+  <div class="form-grid three">
+    <div class="field"><label>地圖 Map</label><select id="formMap"></select></div>
+    <div class="field"><label>角色 Agent</label><select id="formAgent"></select></div>
+    <div class="field"><label>攻守 Side</label><select id="formSide"><option>進攻 Attack</option><option>防守 Defense</option></select></div>
+    <div class="field"><label>技能 Skill</label><select id="formSkill"></select></div>
+    <div class="field"><label>LINEUP 名稱</label><input id="formTitle" required placeholder="例如：A Main 煙球"></div>
+    <div class="field"><label>熟練度 Mastery</label><select id="formMastery"><option>練習中</option><option>熟悉</option><option>熟練</option></select></div>
+  </div>
+  <div class="steps-editor">
+    <div class="step-card"><div class="step-title"><span class="step-num">01</span>站位 Position</div><div class="field"><label>圖片</label><input type="file" accept="image/*" data-step-file="position"><img class="step-preview" id="prev-position"></div><div class="field"><label>備註</label><textarea id="note-position" placeholder="站在哪裡？"></textarea></div></div>
+    <div class="step-card"><div class="step-title"><span class="step-num">02</span>瞄準 Aim</div><div class="field"><label>圖片</label><input type="file" accept="image/*" data-step-file="aim"><img class="step-preview" id="prev-aim"></div><div class="field"><label>備註</label><textarea id="note-aim" placeholder="準心瞄哪裡？"></textarea></div></div>
+    <div class="step-card"><div class="step-title"><span class="step-num">03</span>投擲 Throw</div><div class="field"><label>圖片</label><input type="file" accept="image/*" data-step-file="throw"><img class="step-preview" id="prev-throw"></div><div class="field"><label>投擲方式</label><select id="throwMethod"><option>正常投擲 Normal Throw</option><option>跳到最高點再丟 Jump Apex Throw</option><option>起跳瞬間投擲 Jump Throw</option><option>助跑跳投 Run Jump Throw</option><option>右鍵輕拋 Right Click</option><option>自訂 Custom</option></select></div><div class="field"><label>補充備註</label><textarea id="note-throw"></textarea></div></div>
+    <div class="step-card"><div class="step-title"><span class="step-num">04</span>落點 / 用途 Result</div><div class="field"><label>圖片</label><input type="file" accept="image/*" data-step-file="result"><img class="step-preview" id="prev-result"></div><div class="field"><label>備註</label><textarea id="note-result" placeholder="會落在哪裡？什麼時候用？"></textarea></div></div>
+  </div>
+  <div class="modal-actions"><button type="button" class="btn" data-close="lineupModal">取消</button><button class="btn primary" type="submit">儲存</button></div>
+</form></div></div>
+
+<div class="modal-overlay" id="detailModal"><div class="modal-box"><div class="modal-head"><h3 id="detailTitle">LINEUP</h3><button class="modal-close" data-close="detailModal">✕</button></div><div class="detail-top" id="detailTags"></div><div class="detail-steps" id="detailSteps"></div><div class="modal-actions" id="detailActions"></div></div></div>
+
+<div class="modal-overlay" id="addMapModal"><div class="modal-box small"><div class="modal-head"><h3>新增地圖</h3><button class="modal-close" data-close="addMapModal">✕</button></div><div class="form-grid"><div class="field"><label>中文名稱</label><input id="newMapZh"></div><div class="field"><label>英文名稱</label><input id="newMapEn"></div></div><div class="modal-actions"><button class="btn" data-close="addMapModal">取消</button><button class="btn primary" id="saveMapBtn">新增</button></div></div></div>
+
+<div class="modal-overlay" id="trainingModal"><div class="modal-box" style="width:min(760px,95vw)"><div class="modal-head"><div><h3>每日練槍菜單 Training Routine</h3><div style="font-size:9px;color:#718691;margin-top:4px">照你目前學到的流程整理；每項完成就打勾，最後再簽到。</div></div><button class="modal-close" data-close="trainingModal">✕</button></div><div id="trainingModalList" class="training-full-list"></div><div class="modal-actions"><button class="btn" id="checkinBtn">📅 今日簽到</button></div></div></div>
+
+<div class="modal-overlay" id="trackerSettingsModal"><div class="modal-box small"><div class="modal-head"><h3>Tracker 設定</h3><button class="modal-close" data-close="trackerSettingsModal">✕</button></div><div class="field"><label>Tracker.gg 個人頁網址</label><input id="trackerUrlInput" value="https://tracker.gg/valorant/profile/riot/MinMin%230210/overview"></div><div style="font-size:10px;color:#718691;margin-top:8px">建議不要加入 season 參數，這樣不會綁定單一賽季。</div><div class="modal-actions"><button class="btn" data-close="trackerSettingsModal">取消</button><button class="btn primary" id="saveTrackerSettingsBtn">儲存</button></div></div></div>
+<div class="modal-overlay" id="trackerModal"><div class="modal-box" style="width:min(1200px,96vw)"><div class="modal-head"><h3>Tracker.gg 戰績</h3><div class="tracker-tools"><button class="btn small" id="trackerReload">↻ 回到我的 Tracker</button><button class="modal-close" data-close="trackerModal">✕</button></div></div><iframe id="trackerFrame" class="tracker-frame" src="about:blank"></iframe><div style="font-size:10px;color:#708591;margin-top:8px">若 Tracker.gg 阻擋 iframe 內嵌，瀏覽器可能顯示拒絕連線；這屬於網站端限制。</div></div></div>
+
+<div class="lightbox" id="lightbox"><button class="modal-close" id="lightboxClose">✕</button><img id="lightboxImg" alt="放大圖片"></div>
+<script>
+const STORAGE={maps:'val_maps_v2',lineups:'val_lineups_v2',training:'val_training_v3',checkins:'val_checkins_v2'};
+const defaultMaps=[
+{name:'頂峰亭閣',en:'Summit'},{name:'晶蝕之地',en:'Corrode'},{name:'深窟幽境',en:'Abyss'},{name:'日落之城',en:'Sunset'},{name:'蓮華古城',en:'Lotus'},{name:'深海遺珠',en:'Pearl'},{name:'天漠之峽',en:'Fracture'},{name:'熱帶樂園',en:'Breeze'},{name:'極地寒港',en:'Icebox'},{name:'義境空島',en:'Ascent'},{name:'雙塔迷城',en:'Split'},{name:'遺落境地',en:'Haven'},{name:'劫境之地',en:'Bind'}];
+const agents=[{zh:'愷宙',en:'Killjoy'},{zh:'瑟符',en:'Cypher'},{zh:'歐門',en:'Omen'},{zh:'米克什',en:'Miks'},{zh:'絲凱',en:'Skye'},{zh:'聖祈',en:'Sage'},{zh:'菲德',en:'Fade'},{zh:'薇絲',en:'Vyse'},{zh:'薇蝮',en:'Viper'}];
+const skills={
+Killjoy:[['C','奈米機器蟲','Nanoswarm'],['Q','電偵追擊號','Alarmbot'],['E','重火力砲塔','Turret'],['X','全面封鎖','Lockdown']],
+Cypher:[['C','陷阱絆索','Trapwire'],['Q','網戰牢籠','Cyber Cage'],['E','監控攝影機','Spycam'],['X','神經駭客','Neural Theft']],
+Omen:[['C','瞬步鬼影','Shrouded Step'],['Q','夢魘侵襲','Paranoia'],['E','黑影籠罩','Dark Cover'],['X','闇夜襲擊','From the Shadows']],
+Miks:[['C','調和','Harmonize'],['Q','M脈衝','M-pulse'],['E','波形屏障','Waveform'],['X','低音震盪','Bassquake']],
+Skye:[['C','萌芽重生','Regrowth'],['Q','開路狼鋒','Trailblazer'],['E','引導之鷹','Guiding Light'],['X','追獵精靈','Seekers']],
+Sage:[['C','屏障靈球','Barrier Orb'],['Q','緩速靈球','Slow Orb'],['E','治癒靈球','Healing Orb'],['X','起死回生','Resurrection']],
+Fade:[['C','潛行夢靨','Prowler'],['Q','咒縛夢魘','Seize'],['E','惡夢幽魂','Haunt'],['X','夜幕降臨','Nightfall']],
+Vyse:[['C','荊棘鐵網','Razorvine'],['Q','斷路鐵牆','Shear'],['E','弧光薔薇','Arc Rose'],['X','叢棘盛開','Steel Garden']],
+Viper:[['C','蛇咬毒液','Snake Bite'],['Q','腐蝕毒霧','Poison Cloud'],['E','毒雲瘴壁','Toxic Screen'],['X','蝮蛇領域',"Viper's Pit"]]};
+const themes={
+Viper:{accent:'#78ead8',rgb:'120,234,216',glow:'rgba(76,255,188,.16)',portraitLocal:'Viper-halfbody.png',portraitFallback:'https://game.gtimg.cn/images/val/wallpaper/VIPER.png',portraitSize:'120%',portraitX:'49%',portraitY:'2%'},
+Omen:{accent:'#9297ff',rgb:'146,151,255',glow:'rgba(109,92,255,.18)',portraitLocal:'Omen-halfbody.png',portraitFallback:'https://static.wikia.nocookie.net/valorant/images/0/06/Omen_artwork.png',portraitSize:'120%',portraitX:'70%',portraitY:'3%'},
+Killjoy:{accent:'#f4d35e',rgb:'244,211,94',glow:'rgba(244,211,94,.12)',portraitLocal:'Killjoy-halfbody.png',portraitFallback:'',portraitSize:'115%',portraitX:'50%',portraitY:'0%'},
+Miks:{accent:'#7fd6ff',rgb:'127,214,255',glow:'rgba(127,214,255,.12)',portraitLocal:'Miks-halfbody.png',portraitFallback:'',portraitSize:'115%',portraitX:'50%',portraitY:'3%'},
+Skye:{accent:'#7bd991',rgb:'123,217,145',glow:'rgba(123,217,145,.12)',portraitLocal:'Skye-halfbody.png',portraitFallback:'',portraitSize:'110%',portraitX:'50%',portraitY:'-3%'},
+Sage:{accent:'#76e4d4',rgb:'118,228,212',glow:'rgba(118,228,212,.12)',portraitLocal:'Sage-halfbody.png',portraitFallback:'',portraitSize:'125%',portraitX:'50%',portraitY:'50%'},
+Fade:{accent:'#a889d8',rgb:'168,137,216',glow:'rgba(168,137,216,.13)',portraitLocal:'Fade-halfbody.png',portraitFallback:'',portraitSize:'125%',portraitX:'80%',portraitY:'23%'},
+Vyse:{accent:'#d37cff',rgb:'211,124,255',glow:'rgba(211,124,255,.13)',portraitLocal:'Vyse-halfbody.png',portraitFallback:'',portraitSize:'115%',portraitX:'50%',portraitY:'3%'},
+Cypher:{accent:'#d8eadf',rgb:'216,234,223',glow:'rgba(216,234,223,.11)',portraitLocal:'Cypher-halfbody.png',portraitFallback:'',portraitSize:'113%',portraitX:'50%',portraitY:'3%'}
+};
+const defaultTraining={DAILY:[
+{id:1,title:'冰牆 Peek 一發練習（左 / 右都練）',detail:'訓練場練習模式。蓋冰牆，先躲在牆後；拉出去看一眼 → 回掩體 → 預瞄好 → 再出去一發打頭。左邊與右邊都要練。時間：教學沒有指定。'},
+{id:2,title:'最左 ↔ 最右機器人切換',detail:'訓練場練習模式。先打最左邊機器人，再切到最右邊，左右來回練習大角度轉移。'},
+{id:3,title:'開鏡準心黏頭｜3 分鐘',detail:'訓練場按開始，機器人不動。開鏡瞄準，嘗試讓準心持續黏在機器人頭上。'},
+{id:4,title:'100 Bots｜人不動、右手瞄準｜3 把',detail:'使用捍衛者 Guardian。人物不移動，只用滑鼠瞄準，盡量一發頭。目標盡量 110 秒內打完 100 隻；沒達成也沒關係。'},
+{id:5,title:'100 Bots｜人動、右手不動｜3 把',detail:'使用捍衛者 Guardian。和上一項相反：用人物移動去把準心帶到頭上，右手盡量不要主動瞄準，一發頭。'},
+{id:6,title:'AD 移動瞄頭｜5 分鐘',detail:'訓練場練習模式。右手不主動瞄準，靠 A / D（可用 AA / DD 節奏）移動，嘗試讓準心對到機器人頭上。'},
+{id:7,title:'急停後開槍｜3 分鐘',detail:'一路 A 移動 → 急停 → 開槍；反方向 D 也一樣。重點是練習急停後再開槍。'},
+{id:8,title:'100 Bots｜走路＋右手瞄準｜5 分鐘',detail:'使用捍衛者 Guardian。人物要移動、右手也要瞄準，盡量一發頭；目標盡量 100 秒內完成。'},
+{id:9,title:'婕提大招 左→右→左｜3 輪零失誤',detail:'訓練場練習模式。使用婕提大招，瞄頭由左打到右，再由右打回左算一輪。共 3 輪；失誤就重來。'},
+{id:10,title:'簡單模式｜急停＋瞄準＋開槍｜5 分鐘',detail:'簡單模式中把急停、瞄準與開槍串起來練。'},
+{id:11,title:'中等模式｜3 把｜每把至少 20',detail:'中等模式打 3 把，每把目標至少擊殺 20 個。'},
+{id:12,title:'死鬥 Deathmatch｜原建議 10 把',detail:'教學建議每天 10 把；你可以依時間自行減量。用途主要是熟悉每張地圖的爆頭線與實戰預瞄。'}
+]}
+const demoLineups=[
+{id:900001,map:'熱帶樂園',agent:'Viper',side:'進攻 Attack',skill:'[Q] 腐蝕毒霧 · Poison Cloud',title:'A Main 煙球',mastery:'練習中',favorite:false,steps:{position:{image:'',note:'站在 A Main 外側右邊牆角。'},aim:{image:'',note:'準心對準遠方屋簷與天空交界。'},throw:{image:'',note:'',method:'跳到最高點再丟 Jump Apex Throw'},result:{image:'',note:'煙球落在 A Site 入口內側，遮住主要視線。'}}},
+{id:900002,map:'熱帶樂園',agent:'Viper',side:'進攻 Attack',skill:'[Q] 腐蝕毒霧 · Poison Cloud',title:'B Main 煙球',mastery:'練習中',favorite:false,steps:{position:{image:'',note:'站在 B Main 入口左側牆角。'},aim:{image:'',note:'準心對準建築線與天空交界。'},throw:{image:'',note:'',method:'正常投擲 Normal Throw'},result:{image:'',note:'封住 B Site 主要視線，方便進場。'}}}];
+let maps=load(STORAGE.maps,defaultMaps); let lineups=load(STORAGE.lineups,demoLineups); let training=load(STORAGE.training,defaultTraining); let checkins=load(STORAGE.checkins,[]);
+defaultMaps.forEach(m=>{if(!maps.some(x=>x.name===m.name||x.en===m.en))maps.push({...m})}); demoLineups.forEach(x=>{if(!lineups.some(l=>l.id===x.id))lineups.push(structuredClone(x))});
+let currentMap='熱帶樂園',currentAgent='Viper',currentSide='進攻 Attack',editMode=false,trainingTab='DAILY',stepImages={position:'',aim:'',throw:'',result:''};
+function load(k,d){try{return JSON.parse(localStorage.getItem(k))||structuredClone(d)}catch{return structuredClone(d)}} function save(){localStorage.setItem(STORAGE.maps,JSON.stringify(maps));localStorage.setItem(STORAGE.lineups,JSON.stringify(lineups));localStorage.setItem(STORAGE.training,JSON.stringify(training));localStorage.setItem(STORAGE.checkins,JSON.stringify(checkins))}
+function esc(s=''){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))} function today(){let d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function openModal(id){document.getElementById(id)?.classList.add('open')} function closeModal(id){document.getElementById(id)?.classList.remove('open')}
+document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeModal(b.dataset.close));
+
+function setAgentPortrait(theme){
+  const p=document.getElementById('agentPortrait');
+  if(!p)return;
+  const local=theme?.portraitLocal||'';
+  const fallback=theme?.portraitFallback||'';
+  const useUrl=(url)=>{p.style.backgroundImage=url?`url('${url}')`:''};
+
+  if(local){
+    const img=new Image();
+    img.onload=()=>useUrl(local);
+    img.onerror=()=>useUrl(fallback);
+    img.src=local;
+  }else{
+    useUrl(fallback);
+  }
+}
+function applyTheme(agent){
+  currentAgent=agent;
+  const t=themes[agent]||themes.Viper;
+  let r=document.documentElement.style;
+  r.setProperty('--accent',t.accent);
+  r.setProperty('--accent-rgb',t.rgb);
+  r.setProperty('--agent-glow',t.glow);
+  r.setProperty('--portrait-size',t.portraitSize||'145%');
+  r.setProperty('--portrait-x',t.portraitX||'50%');
+  r.setProperty('--portrait-y',t.portraitY||'3%');
+  setAgentPortrait(t);
+  document.getElementById('agentSign').textContent=agent;
+  document.getElementById('notebookTitle').textContent=`${agent} Lineup Notebook`;
+  document.querySelectorAll('.agent-choice[data-agent]').forEach(b=>b.classList.toggle('active',b.dataset.agent===agent));
+  renderCards()
+}
+document.querySelectorAll('.agent-choice[data-agent]').forEach(b=>b.onclick=()=>applyTheme(b.dataset.agent));
+function setMap(name){currentMap=name;let m=maps.find(x=>x.name===name)||maps[0];document.getElementById('mapZh').textContent=m.name;document.getElementById('mapEn').textContent=m.en||'';closeModal('mapModal');renderMapGrid();renderCards()}
+function renderMapGrid(){let html=maps.map(m=>`<button class="map-pick ${m.name===currentMap?'active':''}" onclick="setMap('${esc(m.name)}')">${esc(m.name)} · ${esc(m.en||'')}</button>`).join('');document.getElementById('mapGrid').innerHTML=html;let tabs=document.getElementById('mapTabs');if(tabs)tabs.innerHTML=maps.map(m=>`<button class="map-tab ${m.name===currentMap?'active':''}" onclick="setMap('${esc(m.name)}')">${esc(m.name)} · ${esc(m.en||'')}</button>`).join('')}
+
+
+function setSide(side){currentSide=side;document.getElementById('attackBtn').classList.toggle('active',side==='進攻 Attack');document.getElementById('defenseBtn').classList.toggle('active',side==='防守 Defense');renderCards()}
+document.getElementById('attackBtn').onclick=()=>setSide('進攻 Attack');document.getElementById('defenseBtn').onclick=()=>setSide('防守 Defense');
+['lineupSearch','masteryFilter','favoriteFilter'].forEach(id=>document.getElementById(id).addEventListener(id==='lineupSearch'?'input':'change',renderCards));
+function filteredLineups(){let q=document.getElementById('lineupSearch').value.trim().toLowerCase(),master=document.getElementById('masteryFilter').value,fav=document.getElementById('favoriteFilter').value==='fav';return lineups.filter(l=>l.map===currentMap&&(l.agent||'Viper')===currentAgent&&(l.side||'進攻 Attack')===currentSide&&(master==='all'||l.mastery===master)&&(!fav||l.favorite)&&(!q||JSON.stringify(l).toLowerCase().includes(q)))}
+function previewOf(l){return l.steps?.result?.image||l.steps?.aim?.image||l.steps?.position?.image||l.image||''}
+function renderCards(){let list=filteredLineups(),cards=document.getElementById('cards');if(!list.length){cards.innerHTML=`<article class="card" style="grid-column:1/-1;padding:40px;text-align:center;color:#708591">${esc(currentMap)} · ${esc(currentAgent)} · ${esc(currentSide)}<br><br>目前還沒有 LINEUP。${editMode?'按上方「＋ 新增 LINEUP」。':'切到編輯模式後可以新增。'}</article>`;return}cards.innerHTML=list.map(l=>{let img=previewOf(l),result=l.steps?.result?.note||'點開查看完整站位、瞄準、投擲與落點。';return `<article class="card" onclick="openDetail(${l.id})"><div class="card-head"><div class="title-row"><h3>${esc(l.title)} <span style="font-size:12px;color:#7d909b">↗</span></h3><div class="card-tools"><button class="tiny-action ${l.favorite?'on':''}" onclick="event.stopPropagation();toggleFavorite(${l.id})">${l.favorite?'★':'☆'}</button>${editMode?`<button class="tiny-action" onclick="event.stopPropagation();openLineup(${l.id})">✎</button><button class="tiny-action" onclick="event.stopPropagation();removeLineup(${l.id})">×</button>`:''}<span class="dots">•••</span></div></div><div class="tags"><span class="tag agent">● ${esc(l.agent)}</span><span class="tag attack">${esc(l.side)}</span><span class="tag practice">★ ${esc(l.mastery||'練習中')}</span></div></div><div class="preview ${img?'':'smoke'}" ${img?`style="background-image:url('${esc(img)}')"`:''}><div class="bookmark">♡</div><div class="play">▶</div></div><div class="card-foot"><div class="desc">${esc(result)}</div><div class="foot-row"><div class="chips"><span class="chip"># ${esc(l.skill||'Skill')}</span>${l.lastReviewed?`<span class="chip">複習 ${esc(l.lastReviewed)}</span>`:''}</div><button class="detail">查看詳情 →</button></div></div></article>`}).join('')}
+function toggleFavorite(id){let l=lineups.find(x=>x.id===id);if(l){l.favorite=!l.favorite;save();renderCards()}} function markReviewed(id){let l=lineups.find(x=>x.id===id);if(l){l.lastReviewed=today();save();renderCards();openDetail(id)}} function removeLineup(id){if(confirm('確定刪除這筆 LINEUP？')){lineups=lineups.filter(x=>x.id!==id);save();renderCards()}}
+
+function skillOptions(agent,preferred=''){let arr=skills[agent]||[];let s=document.getElementById('formSkill');s.innerHTML=arr.map(x=>{let v=`[${x[0]}] ${x[1]} · ${x[2]}`;return `<option ${v===preferred?'selected':''}>${esc(v)}</option>`}).join('')}
+function populateFormSelects(){document.getElementById('formMap').innerHTML=maps.map(m=>`<option value="${esc(m.name)}">${esc(m.name)} · ${esc(m.en||'')}</option>`).join('');document.getElementById('formAgent').innerHTML=agents.map(a=>`<option value="${a.en}">${a.zh} · ${a.en}</option>`).join('')}
+function resetStepImages(){stepImages={position:'',aim:'',throw:'',result:''};['position','aim','throw','result'].forEach(k=>{let p=document.getElementById('prev-'+k);p.src='';p.classList.remove('show')})}
+function openLineup(id=null){populateFormSelects();resetStepImages();document.getElementById('editId').value=id||'';document.getElementById('lineupModalTitle').textContent=id?'編輯 LINEUP 筆記':'新增 LINEUP 筆記';let l=id?lineups.find(x=>x.id===id):null;document.getElementById('formMap').value=l?.map||currentMap;document.getElementById('formAgent').value=l?.agent||currentAgent;document.getElementById('formSide').value=l?.side||currentSide;skillOptions(l?.agent||currentAgent,l?.skill||'');document.getElementById('formTitle').value=l?.title||'';document.getElementById('formMastery').value=l?.mastery||'練習中';document.getElementById('throwMethod').value=l?.steps?.throw?.method||'正常投擲 Normal Throw';['position','aim','throw','result'].forEach(k=>{document.getElementById('note-'+k).value=l?.steps?.[k]?.note||'';let im=l?.steps?.[k]?.image||'';stepImages[k]=im;if(im){let p=document.getElementById('prev-'+k);p.src=im;p.classList.add('show')}});openModal('lineupModal')}
+document.getElementById('formAgent').onchange=e=>skillOptions(e.target.value);
+document.querySelectorAll('[data-step-file]').forEach(inp=>inp.onchange=e=>{let f=e.target.files?.[0];if(!f)return;if(f.size>2*1024*1024){alert('單張圖片建議小於 2MB，避免瀏覽器儲存空間不足。');return}let k=e.target.dataset.stepFile,r=new FileReader();r.onload=()=>{stepImages[k]=r.result;let p=document.getElementById('prev-'+k);p.src=r.result;p.classList.add('show')};r.readAsDataURL(f)});
+document.getElementById('lineupForm').onsubmit=e=>{e.preventDefault();let id=Number(document.getElementById('editId').value)||Date.now();let obj={id,map:document.getElementById('formMap').value,agent:document.getElementById('formAgent').value,side:document.getElementById('formSide').value,skill:document.getElementById('formSkill').value,title:document.getElementById('formTitle').value.trim(),mastery:document.getElementById('formMastery').value,steps:{position:{image:stepImages.position,note:document.getElementById('note-position').value},aim:{image:stepImages.aim,note:document.getElementById('note-aim').value},throw:{image:stepImages.throw,note:document.getElementById('note-throw').value,method:document.getElementById('throwMethod').value},result:{image:stepImages.result,note:document.getElementById('note-result').value}}};let old=lineups.find(x=>x.id===id);if(old){obj.favorite=old.favorite;obj.lastReviewed=old.lastReviewed;lineups=lineups.map(x=>x.id===id?obj:x)}else lineups.push(obj);save();closeModal('lineupModal');currentMap=obj.map;applyTheme(obj.agent);setSide(obj.side);setMap(obj.map);renderCards()};
+
+function openDetail(id){let l=lineups.find(x=>x.id===id);if(!l)return;document.getElementById('detailTitle').textContent=l.title;document.getElementById('detailTags').innerHTML=`<span class="tag agent">${esc(l.agent)}</span><span class="tag attack">${esc(l.side)}</span><span class="tag practice">${esc(l.skill||'')}</span><span class="tag practice">★ ${esc(l.mastery||'')}</span>`;let defs=[['position','01 站位 Position'],['aim','02 瞄準 Aim'],['throw','03 投擲 Throw'],['result','04 落點 / 用途 Result']];document.getElementById('detailSteps').innerHTML=defs.map(([k,t])=>{let s=l.steps?.[k]||{},extra=k==='throw'&&s.method?`<p style="margin-bottom:7px;color:#f4cf75">${esc(s.method)}</p>`:'';return `<div class="detail-step">${s.image?`<img src="${esc(s.image)}" onclick="showLightbox(this.src)">`:''}<div class="copy"><h4>${t}</h4>${extra}<p>${esc(s.note||'尚未填寫')}</p></div></div>`}).join('');document.getElementById('detailActions').innerHTML=`<button class="btn" onclick="toggleFavorite(${l.id});openDetail(${l.id})">${l.favorite?'★ 已收藏':'☆ 收藏'}</button><button class="btn" onclick="markReviewed(${l.id})">✓ 今天複習過</button>${editMode?`<button class="btn primary" onclick="closeModal('detailModal');openLineup(${l.id})">編輯</button>`:''}`;openModal('detailModal')}
+function showLightbox(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('open')} document.getElementById('lightboxClose').onclick=()=>document.getElementById('lightbox').classList.remove('open');
+
+const cm=document.getElementById('controlMenu'),cmb=document.getElementById('settingsBtn');cmb.onclick=e=>{let r=cmb.getBoundingClientRect();cm.style.left=Math.max(8,r.right-220)+'px';cm.style.top=(r.bottom+7)+'px';cm.classList.toggle('open');e.stopPropagation()};document.addEventListener('click',e=>{if(!cm.contains(e.target)&&e.target!==cmb)cm.classList.remove('open')});
+
+document.getElementById('saveMapBtn').onclick=()=>{let name=document.getElementById('newMapZh').value.trim(),en=document.getElementById('newMapEn').value.trim();if(!name)return;maps.push({name,en});save();closeModal('addMapModal');renderMapGrid();document.getElementById('newMapZh').value='';document.getElementById('newMapEn').value=''};
+function exportData(){let blob=new Blob([JSON.stringify({version:2,maps,lineups,training,checkins},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`valorant-lab-backup-${today()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}document.getElementById('exportBtn').onclick=exportData;document.getElementById('importFile').onchange=e=>{let f=e.target.files?.[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d.maps)||!Array.isArray(d.lineups))throw 0;if(confirm('匯入會覆蓋目前資料，確定嗎？')){maps=d.maps;lineups=d.lineups;training=d.training||defaultTraining;checkins=d.checkins||[];save();renderAll()}}catch{alert('備份格式不正確')}};r.readAsText(f);e.target.value=''};
+
+let trackerUrl=localStorage.getItem('val_tracker_url')||'https://tracker.gg/valorant/profile/riot/MinMin%230210/overview';function openTracker(){document.getElementById('trackerFrame').src=trackerUrl;openModal('trackerModal')}document.getElementById('trackerNav').onclick=e=>{e.preventDefault();setActiveNav('tracker');openTracker()};document.getElementById('trackerReload').onclick=()=>document.getElementById('trackerFrame').src=trackerUrl;
+
+function doneKey(){return 'val_today_tasks_'+today()}
+function getDone(){return load(doneKey(),{})}
+function saveDone(o){localStorage.setItem(doneKey(),JSON.stringify(o))}
+function dailyTraining(){return training.DAILY||defaultTraining.DAILY}
+function renderTrainingCard(){
+  let card=document.getElementById('trainingCard'),items=dailyTraining(),done=getDone(),n=items.filter(i=>done[`DAILY_${i.id}`]).length;
+  let preview=items.slice(0,4);
+  card.innerHTML=`<div class="training-head"><div class="side-title">今日練槍 <small>Today's Training</small></div><span>${today()}</span></div>
+  <div class="progress-wrap"><div class="ring"><b>${n}/${items.length}</b></div><div class="quote">「先把動作拆開，再慢慢合起來。」<br><span>${n===items.length?'今日菜單完成，可以簽到。':'完成一項就勾一項。'}</span></div></div>
+  ${preview.map(i=>`<div class="todo" onclick="toggleTraining(${i.id})"><span class="check ${done[`DAILY_${i.id}`]?'done':''}">${done[`DAILY_${i.id}`]?'✓':''}</span><span>${esc(i.title)}</span><span class="arrow">→</span></div>`).join('')}
+  <button class="training-card-more" onclick="openTraining()">查看完整 ${items.length} 項菜單 →</button>
+  <button class="start" onclick="openTraining()">▶ 繼續練習　Continue Training</button>`
+}
+function toggleTraining(id){let d=getDone(),k=`DAILY_${id}`;d[k]=!d[k];saveDone(d);renderTrainingCard();renderCalendar();renderTrainingPage()}
+function openTraining(){showPage('training');renderTrainingPage()}
+function renderTrainingModal(){let done=getDone(),items=dailyTraining();document.getElementById('trainingModalList').innerHTML=items.map((i,idx)=>`<div class="training-task"><span class="training-index">${String(idx+1).padStart(2,'0')}</span><span><div class="training-task-title">${esc(i.title)}</div><div class="training-task-detail">${esc(i.detail||'')}</div></span><span class="check ${done[`DAILY_${i.id}`]?'done':''}" onclick="toggleTraining(${i.id});renderTrainingModal()">${done[`DAILY_${i.id}`]?'✓':''}</span></div>`).join('')}
+document.getElementById('trainingNav').onclick=e=>{e.preventDefault();showPage('training')};
+document.getElementById('lineupNav').onclick=e=>{e.preventDefault();showPage('lineup')};
+document.getElementById('glossaryNav').onclick=e=>{e.preventDefault();showPage('glossary')};
+document.getElementById('checkinBtn').onclick=()=>{if(!checkins.includes(today()))checkins.push(today());save();renderCalendar();renderTrainingPage();alert('今天已簽到 ✓')};
+function renderCalendar(){
+  let cal=document.getElementById('calendar'),d=new Date(),y=d.getFullYear(),m=d.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  let head=cal.closest('.side-card')?.querySelector('.calendar-head b');if(head)head.textContent=`${y} 年 ${m+1} 月`;
+  cal.innerHTML='';for(let i=0;i<first;i++)cal.innerHTML+='<span></span>';
+  for(let day=1;day<=days;day++){
+    let key=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`,cls='day';
+    if(checkins.includes(key))cls+=' signed';
+    if(key===today())cls+=' today';
+    cal.innerHTML+=`<span class="${cls}">${day}</span>`
+  }
+}
+
+
+const trainingSections=[
+  {no:'01',title:'基礎熱身',en:'Basic Warm-up',time:'熱身',ids:[1,2]},
+  {no:'02',title:'準星控制',en:'Crosshair Control',time:'3 分鐘',ids:[3]},
+  {no:'03',title:'100 Bots 練習',en:'100 Bots Practice',time:'3 把 × 2',ids:[4,5]},
+  {no:'04',title:'移動 / 急停',en:'Movement & Counter-strafe',time:'13 分鐘',ids:[6,7,8]},
+  {no:'05',title:'進階練習',en:'Advanced',time:'3 輪 + 3 把',ids:[9,10,11]},
+  {no:'06',title:'死鬥',en:'Deathmatch',time:'可自行減量',ids:[12]}
+];
+const trainingMeta={
+1:['時間未指定','左右都練'],2:['來回切換','大角度轉移'],3:['3 分鐘','開鏡黏頭'],4:['3 把','目標 110 秒'],5:['3 把','只用移動帶準心'],6:['5 分鐘','AD 移動'],7:['3 分鐘','急停開槍'],8:['5 分鐘','目標 100 秒'],9:['3 輪','零失誤'],10:['5 分鐘','簡單模式'],11:['3 把','每把 ≥ 20'],12:['建議 10 把','可自行調整']
+};
+function setActiveNav(page){
+  ['training','lineup','glossary','tracker'].forEach(x=>document.getElementById(x+'Nav')?.classList.toggle('active',x===page));
+}
+function showPage(page){
+  const training=page==='training', lineup=page==='lineup', glossary=page==='glossary';
+  document.getElementById('trainingPage').classList.toggle('active',training);
+  document.getElementById('lineupPage').classList.toggle('active',lineup);
+  document.getElementById('glossaryPage').classList.toggle('active',glossary);
+  setActiveNav(page);
+  if(training)renderTrainingPage();
+  if(glossary)renderGlossary();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderTrainingPage(){
+  let items=dailyTraining(),done=getDone();
+  let n=items.filter(i=>done[`DAILY_${i.id}`]).length,pct=Math.round(n/items.length*100);
+  let groups=document.getElementById('trainingGroups');
+  if(groups)groups.innerHTML=trainingSections.map(sec=>{
+    let drills=sec.ids.map(id=>items.find(x=>x.id===id)).filter(Boolean).map(i=>{
+      let meta=trainingMeta[i.id]||[]; let isDone=!!done[`DAILY_${i.id}`];
+      return `<div class="training-drill ${isDone?'done':''}" onclick="toggleTraining(${i.id})">
+        <div class="drill-thumb"><div class="drill-badge">${i.id}</div></div>
+        <div class="drill-copy"><h4>${esc(i.title)}</h4><p>${esc(i.detail||'')}</p><div class="drill-meta">${meta.map(x=>`<span class="meta-pill">${esc(x)}</span>`).join('')}</div></div>
+        <button class="drill-check" onclick="event.stopPropagation();toggleTraining(${i.id})">${isDone?'✓':'▶'}</button>
+      </div>`
+    }).join('');
+    return `<section class="training-group"><div class="training-group-head"><span class="training-group-no">${sec.no}</span><span class="training-group-title">${sec.title}</span><span class="training-group-en">${sec.en}</span><span class="training-group-time">◷ ${sec.time}</span></div><div class="training-drills">${drills}</div></section>`
+  }).join('');
+  let summary=document.getElementById('trainingSummaryCard');
+  if(summary)summary.innerHTML=`<div class="summary-top"><div class="summary-title">今日進度<small>Today's Progress</small></div><div class="summary-percent">${pct}%</div></div>
+    <div class="summary-shell"><div class="summary-progress"><div class="summary-ring" style="--p:${pct}%"><div class="summary-main"><b>${n}/${items.length}</b><em>已完成</em></div></div><div class="summary-quote">「穩定的練習，<br>會帶來穩定的進步。」<span>Small practice.<br>Big difference.</span></div></div>
+    <div class="summary-stats"><div class="stat-box"><div class="stat-label">總練習時間<br>Total Time</div><div class="stat-value">約 35 分鐘</div></div><div class="stat-box"><div class="stat-label">已完成項目<br>Completed</div><div class="stat-value accent">${n} / ${items.length}</div></div></div></div>
+    <button class="training-main-btn" onclick="${n===items.length?"checkInToday()":"scrollToNextTraining()"}">▶ ${n===items.length?'今日簽到 Check In':'繼續練習 Continue Training'}</button>`;
+  renderTrainingCalendar();
+}
+function scrollToNextTraining(){let done=getDone(),items=dailyTraining(),next=items.find(i=>!done[`DAILY_${i.id}`]);if(!next)return;let el=[...document.querySelectorAll('.drill-badge')].find(x=>x.textContent==next.id)?.closest('.training-drill');el?.scrollIntoView({behavior:'smooth',block:'center'})}
+function checkInToday(){if(!checkins.includes(today()))checkins.push(today());save();renderCalendar();renderTrainingCalendar();renderTrainingPage()}
+function renderTrainingCalendar(){
+  let cal=document.getElementById('trainingCalendar');if(!cal)return;let d=new Date(),y=d.getFullYear(),m=d.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+  document.getElementById('trainingCalendarTitle').textContent=`${y} 年 ${m+1} 月`;cal.innerHTML='';for(let i=0;i<first;i++)cal.innerHTML+='<span></span>';
+  for(let day=1;day<=days;day++){let key=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`,cls='day';if(checkins.includes(key))cls+=' signed';if(key===today())cls+=' today';cal.innerHTML+=`<span class="${cls}">${day}</span>`}
+}
+
+function syncQuickMode(){let b=document.getElementById('quickModeBtn');if(b)b.textContent=editMode?'✏ 編輯 EDIT':'👁 瀏覽 VIEW'}
+document.getElementById('quickModeBtn').onclick=()=>{editMode=!editMode;document.body.classList.toggle('edit-mode',editMode);syncQuickMode();renderCards()};
+document.getElementById('quickAddMapBtn').onclick=()=>openModal('addMapModal');
+document.getElementById('quickAddLineupBtn').onclick=()=>openLineup();
+
+document.getElementById('settingsAddMapBtn').onclick=()=>{cm.classList.remove('open');openModal('addMapModal')};
+document.getElementById('trackerSettingsBtn').onclick=()=>{cm.classList.remove('open');document.getElementById('trackerUrlInput').value=trackerUrl;openModal('trackerSettingsModal')};
+document.getElementById('saveTrackerSettingsBtn').onclick=()=>{
+  const v=document.getElementById('trackerUrlInput').value.trim();
+  if(!v)return alert('請輸入 Tracker.gg 網址');
+  try{
+    const u=new URL(v);
+    u.searchParams.delete('season');
+    trackerUrl=u.toString();
+  }catch{trackerUrl=v.replace(/([?&])season=[^&]*/g,'$1').replace(/[?&]$/,'')}
+  localStorage.setItem('val_tracker_url',trackerUrl);
+  document.getElementById('trackerUrlInput').value=trackerUrl;
+  closeModal('trackerSettingsModal');
+};
+
+
+
+const glossaryTerms=[
+{term:'Spike',cn:'炸彈 / 包',cat:'目標',desc:'進攻方攜帶並安裝的目標物。常聽到「拿包、掉包、下包」。'},
+{term:'Plant',cn:'下包 / 安裝 Spike',cat:'目標',desc:'在指定 Site 內安裝 Spike。'},
+{term:'Defuse',cn:'拆包',cat:'目標',desc:'防守方在 Spike 安裝後進行拆除。'},
+{term:'Site',cn:'炸點 / 點內',cat:'地圖',desc:'可以安裝 Spike 的區域，例如 A Site、B Site。'},
+{term:'Main',cn:'主路 / 主入口',cat:'地圖',desc:'通往 Site 的主要入口，例如 A Main、B Main。'},
+{term:'Mid',cn:'中路',cat:'地圖',desc:'地圖中央區域，常用來轉點或取得地圖控制。'},
+{term:'Heaven',cn:'高台',cat:'地圖',desc:'具有高低差、位於 Site 上方的防守位置常見叫法。'},
+{term:'Hell',cn:'高台下 / 地獄',cat:'地圖',desc:'Heaven 下方或附近的低位區域常見叫法。'},
+{term:'Spawn',cn:'出生點',cat:'地圖',desc:'回合開始時雙方出發的位置。'},
+{term:'Retake',cn:'回防',cat:'進攻方下包後，防守方重新組織進場奪回 Site。'},
+{term:'Rotate',cn:'轉點',cat:'從目前區域快速移動到另一個 Site 或位置。'},
+{term:'Push',cn:'前壓 / 推進',cat:'進攻防守',desc:'主動向前取得空間或資訊。'},
+{term:'Rush',cn:'快攻',cat:'進攻防守',desc:'多人快速集中衝入同一區域。'},
+{term:'Lurk',cn:'單摸 / 慢摸',cat:'進攻防守',desc:'脫離大部隊單獨活動，等待抓轉點或背身時機。'},
+{term:'Flank',cn:'繞後',cat:'進攻防守',desc:'從敵人後方或側後方進攻。'},
+{term:'Trade',cn:'補槍',cat:'進攻防守',desc:'隊友陣亡後立刻擊殺剛交戰的敵人。'},
+{term:'Entry',cn:'首位進點 / 突破',cat:'進攻防守',desc:'第一批進入 Site 創造空間與交戰機會。'},
+{term:'Hold',cn:'架住 / 守角度',cat:'進攻防守',desc:'固定瞄準某個可能出人的角度等待敵人。'},
+{term:'Peek',cn:'拉出去看 / 探頭',cat:'槍法',desc:'從掩體拉出來取得視野或進行交戰。'},
+{term:'Wide Swing',cn:'大拉',cat:'槍法',desc:'一次拉出較大距離，破壞敵人的預瞄位置。'},
+{term:'Jiggle Peek',cn:'小身位探點',cat:'槍法',desc:'快速小幅度進出掩體，主要用來拿資訊或騙槍。'},
+{term:'Pre-aim',cn:'預瞄',cat:'槍法',desc:'在看到敵人前，先把準心放到預期會出人的位置。'},
+{term:'Prefire',cn:'預開槍',cat:'槍法',desc:'預判敵人位置，還沒完全看到人就先開槍。'},
+{term:'Crosshair Placement',cn:'準心預置',cat:'槍法',desc:'移動與搜點時讓準心持續保持在合理的敵人頭部位置。'},
+{term:'Head Level',cn:'爆頭線',cat:'槍法',desc:'地圖中敵人站立時頭部大致會出現的高度。'},
+{term:'Counter-strafe',cn:'急停',cat:'槍法',desc:'移動後迅速停止，再進行較準確的射擊。'},
+{term:'One Tap',cn:'一發頭',cat:'槍法',desc:'單發射擊直接命中頭部完成擊殺。'},
+{term:'Burst',cn:'短點射',cat:'槍法',desc:'一次射出少量子彈，再重新控制準心。'},
+{term:'Spray',cn:'連射 / 壓槍',cat:'槍法',desc:'持續射擊並控制後座力。'},
+{term:'Smoke',cn:'煙',cat:'技能經濟',desc:'用煙霧技能遮蔽視野與切割戰場。'},
+{term:'Flash',cn:'閃',cat:'技能經濟',desc:'讓敵人短暫失去視野的致盲類技能。'},
+{term:'Molly',cn:'燃燒 / 範圍傷害技',cat:'技能經濟',desc:'常指會在地面留下持續傷害區域的技能。'},
+{term:'Ult',cn:'大招',cat:'技能經濟',desc:'Ultimate 的簡稱，角色終極技能。'},
+{term:'Eco',cn:'省錢局',cat:'技能經濟',desc:'少花錢或不買完整裝備，為下一回合保留經濟。'},
+{term:'Full Buy',cn:'全起',cat:'技能經濟',desc:'購買完整主要武器、護甲與需要的技能。'},
+{term:'Force Buy',cn:'強起',cat:'技能經濟',desc:'經濟不足時仍盡可能購買武器與裝備。'},
+{term:'Save',cn:'保槍',cat:'技能經濟',desc:'局勢不利時選擇保留武器到下一回合。'},
+{term:'Clutch',cn:'殘局逆轉',cat:'進攻防守',desc:'人數劣勢下獨自或少數人贏下回合。'}
+];
+let glossaryCategory='全部';
+function renderGlossary(){
+  const q=(document.getElementById('glossarySearch')?.value||'').trim().toLowerCase();
+  const list=glossaryTerms.filter(x=>(glossaryCategory==='全部'||x.cat===glossaryCategory)&&(!q||`${x.term} ${x.cn} ${x.desc}`.toLowerCase().includes(q)));
+  const grid=document.getElementById('glossaryGrid'); if(!grid)return;
+  grid.innerHTML=list.length?list.map(x=>`<article class="glossary-card"><div class="glossary-card-head"><div><div class="glossary-term">${esc(x.term)}</div><div class="glossary-cn">${esc(x.cn)}</div></div><span class="glossary-cat">${esc(x.cat)}</span></div><div class="glossary-desc">${esc(x.desc)}</div></article>`).join(''):`<div class="glossary-empty">找不到符合的術語。</div>`;
+}
+document.getElementById('glossarySearch').addEventListener('input',renderGlossary);
+document.querySelectorAll('.glossary-filter').forEach(b=>b.onclick=()=>{glossaryCategory=b.dataset.cat;document.querySelectorAll('.glossary-filter').forEach(x=>x.classList.toggle('active',x===b));renderGlossary()});
+
+function renderAll(){renderMapGrid();populateFormSelects();renderCards();renderTrainingCard();renderCalendar();renderTrainingPage();renderGlossary();applyTheme(currentAgent);setMap(currentMap);setSide(currentSide);syncQuickMode()}
+renderAll();
+</script>
+</body>
+</html>
